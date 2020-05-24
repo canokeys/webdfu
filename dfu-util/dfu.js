@@ -543,7 +543,7 @@ var dfu = {};
     };
 
     dfu.Device.prototype.poll_until = async function(state_predicate) {
-        let dfu_status = await this.getStatus();
+        let dfu_status;
 
         let device = this;
         function async_sleep(duration_ms) {
@@ -553,10 +553,16 @@ var dfu = {};
             });
         }
         
-        while (!state_predicate(dfu_status.state) && dfu_status.state != dfu.dfuERROR) {
+        do {
+            for (let retry = 0; retry < 5; retry++) {
+                try {
+                    dfu_status = await this.getStatus();
+                    break;             
+                } catch (error) {
+                }
+            }
             await async_sleep(dfu_status.pollTimeout);
-            dfu_status = await this.getStatus();
-        }
+        } while (!state_predicate(dfu_status.state) && dfu_status.state != dfu.dfuERROR);
 
         return dfu_status;
     };
