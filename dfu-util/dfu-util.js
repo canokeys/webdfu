@@ -105,6 +105,7 @@ var device = null;
             radio.value = i;
             radio.id = "interface" + i;
             radio.required = true;
+            if (i===0) radio.selected = "selected";
 
             let label = document.createElement("label");
             label.textContent = formatDFUInterfaceAlternate(interfaces[i]);
